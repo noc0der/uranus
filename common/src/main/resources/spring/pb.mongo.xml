@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+			 http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+
+	<mongo:mongo host="${mongodb.host}" port="${mongodb.port}">
+		<mongo:options connections-per-host="200"
+			threads-allowed-to-block-for-connection-multiplier="200"
+			connect-timeout="0" 
+			max-wait-time="1000" 
+			auto-connect-retry="false"
+			socket-keep-alive="true" socket-timeout="0" />
+	</mongo:mongo>
+	<mongo:db-factory id="mongo.factory" dbname="pb" mongo-ref="mongo" write-concern="FSYNC_SAFE" />
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongo.factory" />
+	</bean>
+	
+	<!-- only op log used -->
+	<mongo:db-factory id="mongo.factory.oplog" dbname="pb" mongo-ref="mongo" write-concern="NORMAL" />
+	<bean id="mongo.tpl.oplog" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongo.factory.oplog" />
+	</bean>
+</beans>
