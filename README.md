@@ -50,15 +50,20 @@
 - [v] lock service
 - [v] code style
 	service:srv/{app}/{model}/{named}
+
 ## ask
--[?] vo vs jsonobject
-	vo.vo这种情况好像出来的是linkedmap(从mongo中出来)
-	-[?] vo vs bsonobject?
-		- 目前没有明确的证据表明bson有优势，可以进行测试，参考温高铁的benchmark
--[v] 为了mongo store搞vo值得么？
-	没意义，mongo只是一部分
--[?] field能用枚举么？
+- [?] vo vs jsonobject(vo.vo这种情况好像出来的是linkedmap(从mongo中出来))
+	- vo vs bsonobject?
+	- 目前没有明确的证据表明bson有优势，可以进行测试，参考温高铁的benchmark
+		
+- [v] 为了mongo store搞vo值得么？
+
+```
+没意义，mongo只是一部分
+```
+
+- [?] field能用枚举么？
 	枚举 vs 普通类 有啥优势么？
-	-[?] 解决存储的问题
--[?] 针对复杂情况的mongo+jsonobject读取 
--[?] sql processor中需要啥？sql执行时长？
+	- [?] 解决存储的问题
+- [?] 针对复杂情况的mongo+jsonobject读取 
+- [?] sql processor中需要啥？sql执行时长？
