@@ -1,0 +1,17 @@
+/target
+/*/target
+/test-output
+/*/test-output
+/bin
+/*/bin
+/.settings
+/*/.settings
+/.project
+/*/.project
+/.classpath
+/*/.classpath
+.DS_Store
+.*.swp
+.*.swo
+.*.swn
+
