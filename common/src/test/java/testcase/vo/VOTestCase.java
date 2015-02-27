@@ -14,6 +14,8 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * 针对vo进行测试
  * 
@@ -73,6 +75,22 @@ public class VOTestCase {
 			end = System.currentTimeMillis();
 			System.out.println("asm style:" + (end - start));
 			
+			//json object
+			JSONObject jo = new JSONObject();
+			jo.put("code_account", "new_value");
+			start = System.currentTimeMillis();
+			for (int i = 0; i < LOOP; i++) {
+				Object obj = jo.get("code_account");
+			}
+			end = System.currentTimeMillis();
+			System.out.println("jsonobject style(get):" + (end - start));
+			//
+			start = System.currentTimeMillis();
+			for (int i = 0; i < LOOP; i++) {
+				String obj = jo.getString("code_account");
+			}
+			end = System.currentTimeMillis();
+			System.out.println("jsonobject style(getString):" + (end - start));
 		} catch (Exception e) {
 			Assert.fail("soso", e);
 		}
@@ -131,6 +149,15 @@ public class VOTestCase {
 			}
 			end = System.currentTimeMillis();
 			System.out.println("asm style:" + (end - start));
+			
+			//json object
+			JSONObject jo = new JSONObject();
+			start = System.currentTimeMillis();
+			for (int i = 0; i < LOOP; i++) {
+				jo.put("code_account","test_new");
+			}
+			end = System.currentTimeMillis();
+			System.out.println("jsonobject style:" + (end - start));
 		} catch (Exception e) {
 			Assert.fail("soso", e);
 		}
