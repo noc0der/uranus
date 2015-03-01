@@ -5,7 +5,10 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import net.popbean.pf.business.service.impl.AbstractBusinessService;
 import net.popbean.pf.cache.test.service.HelloService;
+import net.popbean.pf.cache.test.vo.HelloVO;
+import net.popbean.pf.exception.ErrorBuilder;
 /**
  * 示范cache的使用
  * - Cacheable:存储数据
@@ -15,7 +18,7 @@ import net.popbean.pf.cache.test.service.HelloService;
  *
  */
 @Service("service/test/hello")
-public class HelloServiceImpl implements HelloService {
+public class HelloServiceImpl extends AbstractBusinessService implements HelloService {
 	private int _count =0;
 	@Override
 	public int count() {
@@ -43,5 +46,19 @@ public class HelloServiceImpl implements HelloService {
 	@CacheEvict(value="service/hello",key="'say'")
 	public void clean(){
 		_count = 0;
+	}
+
+	@Override
+	@Cacheable(value="service/hello",key="#pk")
+	public HelloVO find(String pk)throws Exception {
+		try {
+			HelloVO vo = new HelloVO();
+			vo.pk_hello = pk;
+			HelloVO ret = _commondao.find(vo, null);
+			return ret;
+		} catch (Exception e) {
+			ErrorBuilder.createSys().cause(e).execute();
+		}
+		return null;
 	}
 }
