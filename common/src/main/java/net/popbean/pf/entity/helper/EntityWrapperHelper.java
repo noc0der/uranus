@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.popbean.pf.entity.IValueObject;
 import net.popbean.pf.entity.IValueObjectWrapper;
 import net.popbean.pf.entity.field.Domain;
+import net.popbean.pf.entity.model.EntityModel;
 import net.popbean.pf.entity.model.FieldModel;
 import net.popbean.pf.entity.model.helper.EntityModelHelper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -20,37 +23,60 @@ import org.objectweb.asm.Type;
  * @author to0ld
  *
  */
+
 public class EntityWrapperHelper implements Opcodes{
 	//
-	private static Map<String,IValueObjectWrapper> _cache = new ConcurrentHashMap<>();
-	private static SimpleClassLoader classLoader = new SimpleClassLoader();
+	@SuppressWarnings(value="rawtypes")
+	private static  Map<String,IValueObjectWrapper> _cache = new ConcurrentHashMap<>();
 	/**
 	 * 
 	 * @param clazz
 	 * @return
 	 */
-	public static <T> IValueObjectWrapper<T> wrapper(Class<T> clazz)throws Exception{
+	@SuppressWarnings(value={"unchecked","rawtypes"})
+	public static <T extends IValueObject> IValueObjectWrapper<T> wrapper(Class<T> clazz)throws Exception{
 		String key = clazz.getName();
-		IValueObjectWrapper ret = _cache.get(key);
+		IValueObjectWrapper<T> ret = _cache.get(key);
 		if(ret != null){
 			return ret;
 		}
 		byte[] b = dump(clazz);
 		SimpleClassLoader myClassLoader = new SimpleClassLoader();
 		String wrapper_name = key+"Wrapper";//testcase/vo/AccountVOWrapper
+		
 		Class c = myClassLoader.defineClass(wrapper_name, b);
 		ret = (IValueObjectWrapper)c.newInstance();
 		_cache.put(key, ret);
 		return ret;
 	}
+	@SuppressWarnings(value={"unchecked","rawtypes"})
+	public static <T extends IValueObject> IValueObjectWrapper<T> wrapper(EntityModel model)throws Exception{
+		String key = model.clazz;
+		if(StringUtils.isBlank(key)){//如果没有clazz，就直接用code
+			key = model.code;
+		}
+		IValueObjectWrapper ret = _cache.get(key);
+		if(ret != null){
+			return ret;
+		}
+		byte[] b = dump(model);
+		SimpleClassLoader myClassLoader = new SimpleClassLoader();
+		String wrapper_name = key+"Wrapper";//testcase/vo/AccountVOWrapper
+		Class<IValueObjectWrapper> c = (Class<IValueObjectWrapper>)myClassLoader.defineClass(wrapper_name, b);
+		ret = (IValueObjectWrapper)c.newInstance();
+		_cache.put(key, ret);
+		return ret;
+	} 
 	/**
-	 * 构建wrapper的实现
+	 * 提供根据entity model生成wrapper的方法，以便可以通过动态的方式(比如从数据库中读取组装entity model)
+	 * @param model
 	 * @return
+	 * @throws Exception
 	 */
-	private static byte[] dump(Class<?> clazz)throws Exception{
+	public static byte[] dump(EntityModel model)throws Exception{
 		String obj_vendor = "java/lang/Object";
 		String str_vendor = "java/lang/String";
-		String name = clazz.getName();//testcase.vo.AccountVO
+		String name = model.clazz;//testcase.vo.AccountVO
 		String name_vendor = name.replaceAll("\\.", "/");//testcase/vo/AccountVO
 		String wrapper_name = name_vendor+"Wrapper";//testcase/vo/AccountVOWrapper
 		String interface_name = IValueObjectWrapper.class.getName().replaceAll("\\.", "/");//net/popbean/entity/IValueObjectWrapper
@@ -73,7 +99,7 @@ public class EntityWrapperHelper implements Opcodes{
 			mv.visitEnd();
 		}
 		//FIXME set方法
-		List<FieldModel> field_list = EntityModelHelper.parseFieldModelList(clazz);
+		List<FieldModel> field_list = model.field_list;
 		{
 			mv = cw.visitMethod(ACC_PUBLIC, "set", "(L"+name_vendor+";Ljava/lang/String;Ljava/lang/Object;)V", null, null);
 			mv.visitCode();
@@ -175,6 +201,15 @@ public class EntityWrapperHelper implements Opcodes{
 		}
 		cw.visitEnd();
 		return cw.toByteArray();
+	}
+	/**
+	 * 构建wrapper的实现
+	 * @param clazz 其实必须是有ivalue object的
+	 * @return
+	 */
+	private static <T extends IValueObject> byte[] dump(Class<T> clazz)throws Exception{
+		EntityModel model = EntityModelHelper.build(clazz);
+		return dump(model);
 	}
 
 	/**
