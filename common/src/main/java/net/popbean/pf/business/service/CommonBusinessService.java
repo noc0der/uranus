@@ -24,7 +24,7 @@ public interface CommonBusinessService {
 	 * @param param
 	 * @param client
 	 * @return
-	 * @throws BuzException
+	 * @throws BusinessError
 	 */
 	public List<JSONObject> query(StringBuilder sql, JSONObject param, SecuritySession client) throws BusinessError;
 
@@ -34,7 +34,7 @@ public interface CommonBusinessService {
 	 * @param param_list
 	 * @param client
 	 * @return
-	 * @throws BuzException
+	 * @throws BusinessError
 	 */
 	public JSONObject query(List<StringBuilder> sql_list, List<JSONObject> param_list, SecuritySession client) throws BusinessError;
 

@@ -48,6 +48,7 @@ public class EntityModelHelper {
 		model = new EntityModel();
 		model.code = entity.code();
 		model.name = entity.name();
+		model.clazz = key;
 		List<FieldModel> fm_list = parseFieldModelList(clazz);
 		model.field_list = fm_list;
 		_cache.put(key, model);//缓存
