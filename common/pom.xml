@@ -154,6 +154,20 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>osc-repository</id>
+			<name>local private repository</name>
+			<!-- <url>http://maven.oschina.net/content/groups/public/</url> -->
+			<url>http://maven.oschina.net/content/repositories/thirdparty/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>
 			<plugin>
@@ -184,4 +198,18 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>osc-thirdparty</id>
+			<name>osc-thirdparty</name>
+			<url>http://maven.oschina.net/content/repositories/thirdparty/</url>
+		</repository>
+		<!-- 
+		<snapshotRepository>
+			<id>osc-3rdPartySnapshot</id>
+			<name>3rdPartySnapshot</name>
+			<url>http://maven.oschina.net/content/repositories/thirdparty/</url>
+		</snapshotRepository>
+		 -->
+	</distributionManagement>
 </project>
