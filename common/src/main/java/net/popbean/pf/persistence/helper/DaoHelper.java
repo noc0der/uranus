@@ -636,7 +636,6 @@ public class DaoHelper {
 			String prefix = "${";
 			//
 			int start_cond_index = buf.lastIndexOf(cond_pre);// 从尾部开始
-			System.out.println();
 			while (start_cond_index != -1) {
 				int end_cond_index = findPlaceholderEndIndex(buf, start_cond_index, "$[", "]");
 				if (end_cond_index != -1) {
