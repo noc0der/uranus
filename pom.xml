@@ -18,13 +18,18 @@
 	<dependencies>
 	</dependencies>
 	<modules>
-		<module>common</module>
-		<module>security</module>
+		
+		<module>common</module> 
 		<module>entity</module>
-		<module>rule</module>
 		<module>cache</module>
+		<!--
+		<module>security</module>
+		<module>rule</module>
+		
 		<module>dataset</module>
-		<module>mvc</module>
+		
+		 -->
+		 <module>mvc</module>
 	</modules>
 	<build>
 		<pluginManagement>
@@ -42,4 +47,18 @@
 
 		</pluginManagement>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>osc-thirdparty</id>
+			<name>osc-thirdparty</name>
+			<url>http://maven.oschina.net/content/repositories/thirdparty</url>
+		</repository>
+		<!-- 
+		<snapshotRepository>
+			<id>osc-3rdPartySnapshot</id>
+			<name>3rdPartySnapshot</name>
+			<url>http://maven.oschina.net/content/repositories/thirdparty/</url>
+		</snapshotRepository>
+		 -->
+	</distributionManagement>
 </project>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!-- 自动扫描且只扫描@Controller -->
+	<context:component-scan base-package="net.popbean" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+	<!-- 注册给mvc用的 -->
+	<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+		<mvc:message-converters register-defaults="true">
+			<bean class="net.popbean.pf.mvc.convert.JsonObjectHttpMessageConvert">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/plain</value>
+						<value>application/json</value>
+						<value>application/*+json</value>
+					</list>
+				</property>
+			</bean>
+ 
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/plain</value>
+						<value>application/json</value>
+						<value>application/*+json</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+
+		<mvc:argument-resolvers>
+			<bean class="net.popbean.pf.mvc.bind.support.SessionArgumentResolver" />
+			<bean class="net.popbean.pf.mvc.bind.support.JsonObjectArgumentResolver" />
+		</mvc:argument-resolvers>
+	</mvc:annotation-driven>
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/test/**"/>
+			<mvc:mapping path="/it/**"/>
+			<mvc:mapping path="/api/**"/>
+			<mvc:mapping path="/pf/**"/>
+			<mvc:mapping path="/service/**"/>
+			<mvc:mapping path="/node/**"/>
+			<mvc:mapping path="/view/**"/>
+			<mvc:mapping path="/login/**"/>
+			<bean class="net.popbean.pf.mvc.interceptor.TraceInterceptor"/>
+		 </mvc:interceptor>
+		<!-- 类似的还有access token -->
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.meituan.it.pf.security.interceptors.CSRFInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+	<!-- REST中根据URL后缀自动判定Content-Type及相应的View -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10000000" />
+	</bean>
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="mediaTypes">
+			<value>
+				json=application/json
+				xml=application/xml
+				*=*/*
+			</value>
+		</property>
+	</bean>
+
+	<!-- 容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL -->
+	<!-- <mvc:annotation-driven /> -->
+	<mvc:default-servlet-handler />
+     <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">  
+        <property name="templateLoaderPath" value="/WEB-INF/tpls/" />  
+        <property name="defaultEncoding" value="UTF-8" />  
+     </bean>
+	<bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="cache" value="true"/>
+		<property name="contentType" value="text/html;charset=UTF-8" />
+	    <property name="suffix" value=".ftl"/>
+	    <property name="prefix" value=""/>
+	    <property name="requestContextAttribute" value="rc" />
+	</bean>
+	<!-- 将Controller抛出的异常转到特定View, 保持SiteMesh的装饰效果 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.Throwable">error/500</prop>
+			</props>
+		</property>
+	</bean>
+	<beans profile="prod">
+		<context:property-placeholder ignore-unresolvable="true" location="classpath:pb.properties" />
+		<context:property-placeholder ignore-unresolvable="true" location="classpath:pb.data.properties" />
+	</beans>
+	<beans profile="dev">
+		<context:property-placeholder ignore-unresolvable="true" location="classpath:pb.dev.properties" />
+		<context:property-placeholder ignore-unresolvable="true" location="classpath:pb.dev.data.properties" />
+	</beans>
+</beans>
