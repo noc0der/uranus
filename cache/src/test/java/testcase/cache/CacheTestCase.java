@@ -15,8 +15,6 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import testcase.entity.EnumTestCase.TestVO;
-
 /**
  * -[] mongo vs redis
  * -[] available
